@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package todo;
+
+option go_package="/todo";
+
+message TodoItem {
+  int32 id = 1;
+  string text = 2;
+}
+message TodoItems {
+  repeated TodoItem items = 1;
+}
+
+message void {}
+
+service TodoService {
+  rpc CreateTodo(TodoItem) returns (TodoItem);
+  rpc ReadTodo(google.protobuf.Empty) returns (TodoItems);
+  rpc UpdateTodo(TodoItem) returns (TodoItem);
+}

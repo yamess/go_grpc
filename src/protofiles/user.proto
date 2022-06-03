@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package user;
+
+option go_package="/user";
+
+message UserRequest {
+  string Email = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  bool IsActive = 4;
+  bool IsAdmin = 5;
+  google.protobuf.Timestamp CreatedAt = 6;
+}
+
+message UserResponse {
+  string id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  bool is_active = 5;
+  bool is_admin = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message UserList {
+  repeated UserResponse users = 1;
+}
+
+message LoginResponse {
+  string access_token = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message UserId {
+  string id = 1;
+}
+
+message GenericResponse {
+  string text = 1;
+}
+
+service UserService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Me(LoginResponse) returns (UserResponse);
+  rpc CreateUser(UserRequest) returns (UserResponse);
+  rpc GetUser(UserId) returns (UserResponse);
+  rpc GetUserList(google.protobuf.Empty) returns (UserList);
+  rpc UpdateUser(UserResponse) returns (UserResponse);
+  rpc DeleteUser(UserId) returns (GenericResponse);
+}

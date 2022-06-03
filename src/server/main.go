@@ -1,7 +1,10 @@
 package main
 
 import (
+	"github.com/yamess/go-grpc/configs"
+	"github.com/yamess/go-grpc/db"
 	"github.com/yamess/go-grpc/interceptors"
+	"github.com/yamess/go-grpc/model"
 	"github.com/yamess/go-grpc/routes"
 	tpb "github.com/yamess/go-grpc/todo"
 	upb "github.com/yamess/go-grpc/user"
@@ -12,7 +15,12 @@ import (
 )
 
 func main() {
-	lis, err := net.Listen("tcp", ":9000")
+
+	configs.InitEnv()
+
+	db.Automigrate(model.Todo{}, model.User{})
+
+	lis, err := net.Listen("tcp", configs.Host)
 
 	if err != nil {
 		log.Fatalf(err.Error())

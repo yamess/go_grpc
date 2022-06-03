@@ -23,8 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	Authenticate(ctx context.Context, in *Auth, opts ...grpc.CallOption) (*Token, error)
-	Me(ctx context.Context, in *Token, opts ...grpc.CallOption) (*UserResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	Me(ctx context.Context, in *LoginResponse, opts ...grpc.CallOption) (*UserResponse, error)
 	CreateUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUserList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserList, error)
@@ -40,16 +40,16 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) Authenticate(ctx context.Context, in *Auth, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, "/user.UserService/Authenticate", in, out, opts...)
+func (c *userServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) Me(ctx context.Context, in *Token, opts ...grpc.CallOption) (*UserResponse, error) {
+func (c *userServiceClient) Me(ctx context.Context, in *LoginResponse, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, "/user.UserService/Me", in, out, opts...)
 	if err != nil {
@@ -107,8 +107,8 @@ func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserId, opts ...
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	Authenticate(context.Context, *Auth) (*Token, error)
-	Me(context.Context, *Token) (*UserResponse, error)
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	Me(context.Context, *LoginResponse) (*UserResponse, error)
 	CreateUser(context.Context, *UserRequest) (*UserResponse, error)
 	GetUser(context.Context, *UserId) (*UserResponse, error)
 	GetUserList(context.Context, *emptypb.Empty) (*UserList, error)
@@ -121,10 +121,10 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) Authenticate(context.Context, *Auth) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
+func (UnimplementedUserServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedUserServiceServer) Me(context.Context, *Token) (*UserResponse, error) {
+func (UnimplementedUserServiceServer) Me(context.Context, *LoginResponse) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Me not implemented")
 }
 func (UnimplementedUserServiceServer) CreateUser(context.Context, *UserRequest) (*UserResponse, error) {
@@ -155,26 +155,26 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _UserService_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Auth)
+func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).Authenticate(ctx, in)
+		return srv.(UserServiceServer).Login(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.UserService/Authenticate",
+		FullMethod: "/user.UserService/Login",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Authenticate(ctx, req.(*Auth))
+		return srv.(UserServiceServer).Login(ctx, req.(*LoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_Me_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Token)
+	in := new(LoginResponse)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func _UserService_Me_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: "/user.UserService/Me",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Me(ctx, req.(*Token))
+		return srv.(UserServiceServer).Me(ctx, req.(*LoginResponse))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -289,8 +289,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Authenticate",
-			Handler:    _UserService_Authenticate_Handler,
+			MethodName: "Login",
+			Handler:    _UserService_Login_Handler,
 		},
 		{
 			MethodName: "Me",

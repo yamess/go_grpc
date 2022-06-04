@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  grpc_pg_db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: admin
+      POSTGRES_DB: grpc_db
+    ports:
+      - 5432:5432
+    volumes:
+      - grpc_pg_db_vol:/var/lib/postgresql/data
+
+volumes:
+  grpc_pg_db_vol:

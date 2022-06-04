@@ -1,23 +1,92 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 package todo;
 
-option go_package="/todo";
+option go_package="/protos/todo";
 
-message TodoItem {
-  int32 id = 1;
+enum Status {
+  UNKNOWN_STATUS = 0;
+  PENDING = 1;
+  STARTED = 2;
+  COMPLETED = 3;
+}
+
+message TodoObject {
+  uint32 id = 1;
+  string user_id = 2;
+  string text = 3;
+  Status status = 4;
+  google.protobuf.Timestamp created_at = 5;
+  string created_by = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string updated_by = 8;
+}
+
+message CreateTodoRequest {
+  string user_id = 1;
   string text = 2;
 }
-message TodoItems {
-  repeated TodoItem items = 1;
+
+message CreateTodoResponse {
+  uint32 id = 1;
+  string user_id = 2;
+  string text = 3;
+  Status status = 4;
+  google.protobuf.Timestamp created_at = 5;
 }
 
-message void {}
+message GetTodoRequest {
+  uint32 id = 1;
+  string user_id = 2;
+}
+
+message GetTodoResponse {
+  uint32 id = 1;
+  string user_id = 2;
+  string text = 3;
+  Status status = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message GetTodoListRequest {
+  string user_id = 1;
+}
+
+message GetTodoListResponse {
+  repeated GetTodoResponse TodoList = 1;
+}
+
+message UpdateTodoRequest {
+  uint32 id = 1;
+  string user_id = 2;
+  string text = 3;
+  Status status = 4;
+}
+
+message UpdateTodoResponse {
+  uint32 id = 1;
+  string user_id = 2;
+  string text = 3;
+  Status status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message DeleteTodoRequest {
+  uint32 id = 1;
+  string user_id = 2;
+}
+
+message DeleteTodoResponse {
+  string message = 1;
+}
 
 service TodoService {
-  rpc CreateTodo(TodoItem) returns (TodoItem);
-  rpc ReadTodo(google.protobuf.Empty) returns (TodoItems);
-  rpc UpdateTodo(TodoItem) returns (TodoItem);
+  rpc CreateTodo(CreateTodoRequest) returns (CreateTodoResponse);
+  rpc GetTodo(GetTodoRequest) returns (GetTodoResponse);
+  rpc GetTodoList(GetTodoListRequest) returns (stream GetTodoListResponse);
+  rpc UpdateTodo(UpdateTodoRequest) returns (UpdateTodoResponse);
+  rpc DeleteTod(DeleteTodoRequest) returns (DeleteTodoResponse);
 }

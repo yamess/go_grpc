@@ -3,9 +3,7 @@ package model
 import (
 	"github.com/google/uuid"
 	"github.com/yamess/go-grpc/db"
-	pb "github.com/yamess/go-grpc/user"
 	"github.com/yamess/go-grpc/utils"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"log"
@@ -13,54 +11,57 @@ import (
 )
 
 type User struct {
-	Id        string
-	Email     string
-	FirstName string
-	LastName  string
-	Password  string
-	IsActive  bool
-	IsAdmin   bool
-	CreatedAt time.Time
+	Id       string `gorm:"primaryKey:unique"`
+	Email    string `validate:"email" gorm:"unique"`
+	Password string
+	IsActive bool
+	IsAdmin  bool
+	Base
 }
 
-type Todo struct {
-	Id   string
-	Text string
-}
-
-func (user *User) GetRPCModel() pb.UserResponse {
-	return pb.UserResponse{
-		Id:        user.Id,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
-		IsActive:  user.IsActive,
-		IsAdmin:   user.IsAdmin,
-		CreatedAt: timestamppb.New(user.CreatedAt),
-	}
-}
-
-func (user *User) FromRPC(userGrpc *pb.UserRequest) {
-	user.FirstName = userGrpc.FirstName
-	user.LastName = userGrpc.LastName
-	user.Email = userGrpc.Email
-	user.IsAdmin = userGrpc.IsAdmin
-	user.IsActive = userGrpc.IsActive
-}
-
-// CreateRecord CRUD
+// CreateRecord function to create new user
 func (user *User) CreateRecord() *gorm.DB {
+
+	// Hash user password
 	hashedPwd, err := utils.HashPassword(user.Password)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
+
 	user.Password = hashedPwd
 	user.Id = uuid.New().String()
-	user.CreatedAt = time.Now()
+	user.CreatedBy = user.Id
+	user.CreatedAt = time.Now().UTC()
 
 	res := db.MyDB.Conn.
 		Model(&user).
 		Clauses(clause.Returning{}).
 		Create(&user)
+	return res
+}
+
+// GetUser function to a get a single user
+func (user *User) GetUser() *gorm.DB {
+	res := db.MyDB.Conn.Find(&user)
+	return res
+}
+
+// UpdateUser function to update an existing user
+func (user *User) UpdateUser() *gorm.DB {
+
+	user.UpdatedAt.Time = time.Now().UTC()
+	user.UpdatedBy = user.Id
+
+	res := db.MyDB.Conn.
+		Model(&user).
+		Clauses(clause.Returning{}).
+		Omit("Id", "CreatedAt", "CreatedBy", "Password").
+		Updates(&user)
+	return res
+}
+
+// DeleteUser function to delete an existing user
+func (user *User) DeleteUser() *gorm.DB {
+	res := db.MyDB.Conn.Delete(&user)
 	return res
 }

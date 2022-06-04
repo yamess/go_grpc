@@ -11,6 +11,7 @@ var Host string
 var DbUrl string
 
 const HashingCost = 10
+const DefaultUser = "32bf3358-b8ae-4d75-bc08-fc4f34d808c8"
 
 func InitEnv() {
 	if err := godotenv.Load("../../.env"); err != nil {

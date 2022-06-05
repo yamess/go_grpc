@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/yamess/go-grpc/db"
 	"github.com/yamess/go-grpc/utils"
@@ -41,8 +42,9 @@ func (user *User) CreateRecord() *gorm.DB {
 }
 
 // GetUser function to a get a single user
-func (user *User) GetUser() *gorm.DB {
-	res := db.MyDB.Conn.First(&user)
+func (user *User) GetUser(searchField string, searchValue any) *gorm.DB {
+	query := fmt.Sprintf("%s = ?", searchField)
+	res := db.MyDB.Conn.Where(query, searchValue).First(&user)
 	return res
 }
 
@@ -56,6 +58,24 @@ func (user *User) UpdateUser() *gorm.DB {
 		Model(&user).
 		Clauses(clause.Returning{}).
 		Omit("Id", "CreatedAt", "CreatedBy", "Password").
+		Updates(&user)
+	return res
+}
+
+func (user *User) UpdatePassword() *gorm.DB {
+	hashedPwd, err := utils.HashPassword(user.Password)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	user.Password = hashedPwd
+	user.UpdatedAt.Time = time.Now().UTC()
+	user.UpdatedBy = user.Id
+
+	res := db.MyDB.Conn.
+		Model(&user).
+		Clauses(clause.Returning{}).
+		Select("Password", "CreatedAt", "CreatedBy").
 		Updates(&user)
 	return res
 }

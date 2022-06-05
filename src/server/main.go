@@ -5,9 +5,9 @@ import (
 	"github.com/yamess/go-grpc/db"
 	"github.com/yamess/go-grpc/interceptors"
 	"github.com/yamess/go-grpc/model"
+	tpb "github.com/yamess/go-grpc/protos/todo"
+	upb "github.com/yamess/go-grpc/protos/user"
 	"github.com/yamess/go-grpc/routes"
-	tpb "github.com/yamess/go-grpc/todo"
-	upb "github.com/yamess/go-grpc/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
@@ -39,5 +39,4 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %s", err.Error())
 	}
-
 }

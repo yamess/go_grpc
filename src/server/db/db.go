@@ -4,6 +4,7 @@ import (
 	"github.com/yamess/go-grpc/configs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
 )
 
@@ -14,7 +15,7 @@ type myDB struct {
 var MyDB = myDB{}
 
 func (pg *myDB) Connect() {
-	db, err := gorm.Open(postgres.Open(configs.DbUrl), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(configs.DbUrl), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 
 	if err != nil {
 		log.Println(err.Error())

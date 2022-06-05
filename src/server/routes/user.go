@@ -19,7 +19,7 @@ func (s *UserServer) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (
 	var userResponse pb.CreateUserResponse
 
 	// Convert Proto buffer data to desired struct
-	us := model.User{Email: in.Email, Password: in.Password, IsActive: in.IsActive, IsAdmin: in.IsAdmin}
+	us := model.User{Email: in.Email, Password: in.Password, IsActive: &in.IsActive, IsAdmin: &in.IsAdmin}
 
 	// Save data in database
 	res := us.CreateRecord()
@@ -31,7 +31,7 @@ func (s *UserServer) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (
 
 	// Convert back to proto buffer data type
 	userResponse = pb.CreateUserResponse{
-		Id: us.Id, Email: us.Email, IsActive: us.IsActive, IsAdmin: us.IsAdmin,
+		Id: us.Id, Email: us.Email, IsActive: *us.IsActive, IsAdmin: *us.IsAdmin,
 		CreatedAt: timestamppb.New(us.CreatedAt),
 	}
 	return &userResponse, nil
@@ -53,7 +53,7 @@ func (s *UserServer) GetUser(ctx context.Context, in *pb.GetUserRequest) (*pb.Ge
 
 	// Convert back to proto buffer data type
 	response = pb.GetUserResponse{
-		Id: us.Id, Email: us.Email, IsActive: us.IsActive, IsAdmin: us.IsAdmin,
+		Id: us.Id, Email: us.Email, IsActive: *us.IsActive, IsAdmin: *us.IsAdmin,
 		CreatedAt: timestamppb.New(us.CreatedAt),
 	}
 
@@ -64,7 +64,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, in *pb.UpdateUserRequest) (
 	var response pb.UpdateUserResponse
 
 	us := model.User{
-		Id: in.Id, Email: in.Email, IsActive: in.IsActive, IsAdmin: in.IsAdmin,
+		Id: in.Id, Email: in.Email, IsActive: &in.IsActive, IsAdmin: &in.IsAdmin,
 	}
 	res := us.UpdateUser()
 	if res.Error != nil {
@@ -74,7 +74,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, in *pb.UpdateUserRequest) (
 	}
 
 	response = pb.UpdateUserResponse{
-		Id: us.Id, Email: us.Email, IsActive: us.IsActive, IsAdmin: us.IsAdmin,
+		Id: us.Id, Email: us.Email, IsActive: *us.IsActive, IsAdmin: *us.IsAdmin,
 		CreatedAt: timestamppb.New(us.CreatedAt), UpdatedAt: timestamppb.New(us.UpdatedAt.Time),
 	}
 

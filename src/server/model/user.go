@@ -14,8 +14,8 @@ type User struct {
 	Id       string `gorm:"primaryKey:unique"`
 	Email    string `validate:"email" gorm:"unique"`
 	Password string
-	IsActive bool
-	IsAdmin  bool
+	IsActive *bool
+	IsAdmin  *bool
 	Base
 }
 
@@ -42,7 +42,7 @@ func (user *User) CreateRecord() *gorm.DB {
 
 // GetUser function to a get a single user
 func (user *User) GetUser() *gorm.DB {
-	res := db.MyDB.Conn.Find(&user)
+	res := db.MyDB.Conn.First(&user)
 	return res
 }
 

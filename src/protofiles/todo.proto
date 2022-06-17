@@ -1,23 +1,107 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 
 package todo;
 
-option go_package="/todo";
+option go_package="/protos/todo";
 
-message TodoItem {
-  int32 id = 1;
-  string text = 2;
-}
-message TodoItems {
-  repeated TodoItem items = 1;
+enum Status {
+  UNKNOWN_STATUS = 0;
+  NOT_STARTED = 2;
+  STARTED = 3;
+  COMPLETED = 4;
 }
 
-message void {}
+message TodoObject {
+  uint32 id = 1;
+  string user_id = 2;
+  string title = 3;
+  string text = 4;
+  google.protobuf.Duration duration = 5;
+  google.protobuf.Timestamp start_time = 6;
+  Status status = 7;
+  google.protobuf.Timestamp created_at = 8;
+  string created_by = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string updated_by = 11;
+}
+
+message CreateTodoRequest {
+  string user_id = 1;
+  string title = 2;
+  string text = 3;
+  google.protobuf.Duration duration = 4;
+  google.protobuf.Timestamp start_time = 5;
+}
+
+message CreateTodoResponse {
+  uint32 id = 1;
+  string user_id = 2;
+  string title = 3;
+  string text = 4;
+  Status status = 5;
+  google.protobuf.Duration duration = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message GetTodoRequest {
+  uint32 id = 1;
+  string user_id = 2;
+}
+
+message GetTodoResponse {
+  uint32 id = 1;
+  string user_id = 2;
+  string title = 3;
+  string text = 4;
+  Status status = 5;
+  google.protobuf.Duration duration = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message GetTodoListRequest {
+  string user_id = 1;
+}
+
+message UpdateTodoRequest {
+  uint32 id = 1;
+  string user_id = 2;
+  string title = 3;
+  string text = 4;
+  Status status = 5;
+  google.protobuf.Duration duration = 6;
+  google.protobuf.Timestamp start_time = 7;
+}
+
+message UpdateTodoResponse {
+  uint32 id = 1;
+  string user_id = 2;
+  string title = 3;
+  string text = 4;
+  Status status = 5;
+  google.protobuf.Duration duration = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message DeleteTodoRequest {
+  uint32 id = 1;
+  string user_id = 2;
+}
+
+message DeleteTodoResponse {
+  string message = 1;
+}
 
 service TodoService {
-  rpc CreateTodo(TodoItem) returns (TodoItem);
-  rpc ReadTodo(google.protobuf.Empty) returns (TodoItems);
-  rpc UpdateTodo(TodoItem) returns (TodoItem);
+  rpc CreateTodo(CreateTodoRequest) returns (CreateTodoResponse);
+  rpc GetTodo(GetTodoRequest) returns (GetTodoResponse);
+  rpc GetTodoList(GetTodoListRequest) returns (stream GetTodoResponse);
+  rpc UpdateTodo(UpdateTodoRequest) returns (UpdateTodoResponse);
+  rpc DeleteTodo(DeleteTodoRequest) returns (DeleteTodoResponse);
 }

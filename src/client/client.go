@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	proto "github.com/yamess/go-grpc/client/user"
+	proto "github.com/yamess/go-grpc/client/protos/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -17,11 +17,12 @@ func main() {
 	}
 
 	client := proto.NewUserServiceClient(conn)
+	//md := metadata.New(map[string]string{"Authorization": "Bearer 232dsfdfd"})
 
 	g := gin.Default()
 
 	g.POST("/create/user", func(ctx *gin.Context) {
-		var user proto.UserRequest
+		var user proto.CreateUserRequest
 		err = ctx.BindJSON(&user)
 
 		if err != nil {

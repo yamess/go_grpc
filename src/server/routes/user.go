@@ -18,7 +18,7 @@ type UserServer struct {
 	pb.UserServiceServer
 }
 
-func (s *UserServer) Login(cxt context.Context, in *pb.LoginRequest) (*pb.LoginResponse, error) {
+func (s *UserServer) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginResponse, error) {
 	user := model.User{
 		Email: in.Email,
 	}
